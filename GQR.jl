@@ -18,3 +18,12 @@ b_filter(Y, D[:,2], 0.4)
 function delta_hat(b, X, D, Y)
    ml(delta)= sum((Y.<=D.*b)log(LogExpFunctions.logistic(X.*delta'))+(Y.>D.*b)log(1-LogExpFunctions.logistic(X.*delta')))
    optimize(ml, ones(size(X, 2)))
+end
+
+function b_filteralter(Y, D, t, b)
+    mu_up(sigma) =(sum(Y.-D.*b'.<=sigma)/length(Y)-t)^2
+    mu_low(sigma) =(sum(Y.-D.*b'.<=sigma)/length(Y)-t+1/length(Y))^2
+    up = Optim.optimize(mu_up,zeros(1))
+    low = Optim.optimize(mu_low,zeros(1))
+    bound = [Optim.minimizer(low), Optim.minimizer(up)]
+ end
